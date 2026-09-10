@@ -1,10 +1,11 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import api from '../services/api'
 import Layout from '../components/Layout'
 
 export default function Login() {
   const navigate = useNavigate() // Navegador inicializado aqui
+  const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
@@ -25,11 +26,15 @@ export default function Login() {
       localStorage.setItem('accessToken', access)
       localStorage.setItem('refreshToken', refresh)
 
-      // Redireciona direto pro painel sem piscar a tela
-      navigate('/dashboard') 
+      const { data: user } = await api.get('/auth/me/')
+      const destino = location.state?.from
+        || (user.is_professional ? `/${user.professional_slug}/dashboard` : '/')
+      navigate(destino, { replace: true })
       
     } catch (err) {
       console.error(err)
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
       setError("Falha no login. Verifique suas credenciais.")
     } finally {
       setLoading(false)
@@ -85,6 +90,9 @@ export default function Login() {
       <div className="text-center mt-5 text-[11px] text-[#889999]">
         Sistema integrado com API Django &bull; Calash
       </div>
+      <Link to="/register" state={location.state} className="block text-center mt-3 text-sm text-[#779FA3] hover:underline">
+        Criar conta de cliente
+      </Link>
     </Layout>
   )
 }
