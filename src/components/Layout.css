@@ -1,0 +1,122 @@
+.layout-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #2c2c2c;
+  background: #f4fbfc;
+}
+
+.layout-card {
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #d5ebeb;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(119, 159, 163, 0.15);
+}
+
+.layout-header {
+  position: relative;
+  padding: 35px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #afe9f0, #95c6cc);
+  border-bottom: 1px solid #d5ebeb;
+}
+
+.layout-title {
+  margin: 0 0 4px;
+  color: #2c2c2c;
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.layout-subtitle {
+  margin: 0;
+  color: #4a5c5c;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.layout-content {
+  padding: 30px 25px;
+}
+
+.user-menu {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 2;
+}
+
+.user-menu-trigger {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: #4a5c5c;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.user-menu-trigger:hover {
+  background: #fff;
+}
+
+.user-menu-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.user-menu-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  display: flex;
+  min-width: 170px;
+  flex-direction: column;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #d5ebeb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(44, 44, 44, 0.14);
+}
+
+.user-menu-dropdown a,
+.user-menu-dropdown button {
+  padding: 9px 10px;
+  color: #4a5c5c;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.user-menu-dropdown a:hover,
+.user-menu-dropdown button:hover {
+  background: #f4fbfc;
+}
+
+.user-menu-dropdown button {
+  color: #dc2626;
+}
+
+.user-menu-name {
+  max-width: 150px;
+  padding: 7px 10px;
+  overflow: hidden;
+  color: #779fa3;
+  font-size: 11px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,13 +1,40 @@
 import { useEffect, useState } from 'react'
 import api from '../services/api'
+import './AgendaGrid.css'
 
-export default function AgendaGrid({ isProfessional }) {
-  const [dataSelecionada, setDataSelecionada] = useState(new Date().toISOString().split('T')[0])
+export default function AgendaGrid({ isProfessional, publicSlug = null, selectedDate, onDateChange }) {
+  const [dataInterna, setDataInterna] = useState(new Date().toISOString().split('T')[0])
+  const dataSelecionada = selectedDate ?? dataInterna
   const [agendamentos, setAgendamentos] = useState({})
+  const [expediente, setExpediente] = useState([])
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState(null)
 
-  const horarios = ['10:00', '13:30', '17:00', '20:30']
+  const dataLocal = new Date(`${dataSelecionada}T00:00:00`)
+  const weekday = dataLocal.getDay() === 0 ? 6 : dataLocal.getDay() - 1
+  const janelaDoDia = expediente.find((item) => item.weekday === weekday)
+  const horarios = []
+
+  if (janelaDoDia) {
+    const [horaInicio, minutoInicio] = janelaDoDia.start_time.slice(0, 5).split(':').map(Number)
+    const [horaFim, minutoFim] = janelaDoDia.end_time.slice(0, 5).split(':').map(Number)
+    const inicio = horaInicio * 60 + minutoInicio
+    const fim = horaFim * 60 + minutoFim
+
+    for (let minutos = inicio; minutos < fim; minutos += 60) {
+      horarios.push(`${String(Math.floor(minutos / 60)).padStart(2, '0')}:${String(minutos % 60).padStart(2, '0')}`)
+    }
+  }
+
+  useEffect(() => {
+    const endpoint = publicSlug
+      ? `/public/${publicSlug}/working-hours/`
+      : '/services/working-hours/'
+
+    api.get(endpoint)
+      .then(({ data }) => setExpediente(data))
+      .catch(() => setErro('Não foi possível carregar o expediente.'))
+  }, [publicSlug])
 
   useEffect(() => {
     let ativo = true
@@ -17,10 +44,17 @@ export default function AgendaGrid({ isProfessional }) {
       setErro(null)
 
       try {
-        const response = await api.get('/appointments/', {
+        const response = await api.get(publicSlug ? `/public/${publicSlug}/schedule/` : '/appointments/', {
           params: { date: dataSelecionada }
         })
-        const agendamentosPorHorario = response.data.reduce((agenda, agendamento) => {
+        const agendamentosPorHorario = publicSlug
+          ? response.data.slots.reduce((agenda, slot) => {
+            agenda[slot.time] = slot.available
+              ? null
+              : { status: 'occupied' }
+            return agenda
+          }, {})
+          : response.data.reduce((agenda, agendamento) => {
           const horario = new Date(agendamento.start_datetime).toTimeString().slice(0, 5)
           agenda[horario] = {
             id: agendamento.id,
@@ -44,7 +78,7 @@ export default function AgendaGrid({ isProfessional }) {
 
     carregarAgendamentos()
     return () => { ativo = false }
-  }, [dataSelecionada])
+  }, [dataSelecionada, publicSlug])
 
   const handleCliqueHorario = (horario) => {
     const conflito = agendamentos[horario]
@@ -70,58 +104,63 @@ export default function AgendaGrid({ isProfessional }) {
   }
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-[#D5EBEB]">
+    <div className="agenda-grid">
       {/* Seletor de Datas */}
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-xl font-['Playfair_Display'] font-semibold">Agenda Diária</h2>
-        <input 
+        {!publicSlug && <input
           type="date" 
           value={dataSelecionada}
-          onChange={(e) => setDataSelecionada(e.target.value)}
+          onChange={(e) => (onDateChange ? onDateChange(e.target.value) : setDataInterna(e.target.value))}
           // Lógica restritiva aplicada aqui baseada no perfil
           className="border border-[#D5EBEB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#95C6CC]"
-        />
+        />}
       </div>
 
       {/* Tabela Inspirada na Imagem */}
-      <div className="flex flex-col border border-[#D5EBEB] rounded-lg overflow-hidden">
-        <div className="grid grid-cols-4 bg-[#F4FBFC] font-semibold text-[#779FA3] text-xs p-3 uppercase">
+      <div className="agenda-grid-table">
+        <div className="agenda-grid-header">
           <div>Horário</div>
-          <div className="col-span-2">Cliente / Procedimento</div>
+          <div>Cliente / Procedimento</div>
           <div className="text-center">Status</div>
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto">
+        <div className="agenda-grid-scroll">
+          {horarios.length === 0 && (
+            <p className="border-t border-[#D5EBEB] p-4 text-sm text-slate-400">
+              Nenhum horário configurado para este dia.
+            </p>
+          )}
           {horarios.map((horario) => {
             const ocupado = agendamentos[horario]
             
             return (
-              <div 
+              <div
                 key={horario}
                 onClick={() => handleCliqueHorario(horario)}
-                className="grid grid-cols-4 border-t border-[#D5EBEB] p-3 text-sm hover:bg-slate-50 cursor-pointer transition-colors items-center"
+                className="agenda-grid-row text-sm"
               >
                 <div className="font-medium text-slate-500">{horario}</div>
-                <div className="col-span-2 text-slate-700">
-                  {ocupado ? (
+                <div className="text-slate-700">
+                  {ocupado && !publicSlug ? (
                     <>
                       <div>{ocupado.cliente}</div>
                       <div className="text-xs text-slate-400">{ocupado.procedimento}</div>
                     </>
-                  ) : <span className="text-slate-300 italic">Disponível</span>}
+                  ) : <span className={ocupado ? 'text-red-400' : 'text-slate-300'}>{ocupado ? 'Indisponível' : 'Disponível'}</span>}
                 </div>
-                <div className="text-center">
-                  {ocupado?.status === 'aguardando_aprovacao' && (
+                <div className="agenda-grid-status">
+                  {!publicSlug && ocupado?.status === 'aguardando_aprovacao' && (
                     <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs font-semibold">
                       Em Análise
                     </span>
                   )}
-                  {ocupado?.status === 'pending' && isProfessional && (
+                  {!publicSlug && ocupado?.status === 'pending' && isProfessional && (
                     <button type="button" onClick={(event) => { event.stopPropagation(); aprovarAgendamento(ocupado.id) }} className="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs font-semibold">
                       Aprovar
                     </button>
                   )}
-                  {ocupado?.status === 'scheduled' && (
+                  {!publicSlug && ocupado?.status === 'scheduled' && (
                     <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-semibold">
                       Agendado
                     </span>

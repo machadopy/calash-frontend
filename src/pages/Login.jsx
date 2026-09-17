@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from '../services/api'
 import Layout from '../components/Layout'
 
@@ -10,6 +10,30 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!localStorage.getItem('accessToken')) return
+
+    api.get('/auth/me/')
+      .then(({ data: user }) => {
+        const origem = location.state?.from
+        const slugDaOrigem = origem?.match(/^\/([^/]+)/)?.[1]
+
+        if (user.is_superuser) {
+          window.location.assign('http://127.0.0.1:8000/admin/')
+          return
+        }
+
+        const destino = user.is_professional
+          ? (origem || `/${user.professional_slug}/dashboard`)
+          : (slugDaOrigem ? `/${slugDaOrigem}` : '/calash')
+        navigate(destino, { replace: true })
+      })
+      .catch(() => {
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+      })
+  }, [location.state, navigate])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -25,16 +49,27 @@ export default function Login() {
       const { access, refresh } = response.data
       localStorage.setItem('accessToken', access)
       localStorage.setItem('refreshToken', refresh)
+      window.dispatchEvent(new Event('calash:auth-changed'))
 
       const { data: user } = await api.get('/auth/me/')
-      const destino = location.state?.from
-        || (user.is_professional ? `/${user.professional_slug}/dashboard` : '/')
-      navigate(destino, { replace: true })
+      const origem = location.state?.from
+      const slugDaOrigem = origem?.match(/^\/([^/]+)/)?.[1]
+      const destino = user.is_superuser
+        ? 'http://127.0.0.1:8000/admin/'
+        : user.is_professional
+        ? (origem || `/${user.professional_slug}/dashboard`)
+        : (slugDaOrigem ? `/${slugDaOrigem}` : '/calash')
+      if (destino.startsWith('http')) {
+        window.location.assign(destino)
+      } else {
+        navigate(destino, { replace: true })
+      }
       
     } catch (err) {
       console.error(err)
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
+      window.dispatchEvent(new Event('calash:auth-changed'))
       setError("Falha no login. Verifique suas credenciais.")
     } finally {
       setLoading(false)
@@ -42,7 +77,7 @@ export default function Login() {
   }
 
   return (
-    <Layout title="Calash" subtitle="Acesse o painel para gerenciar o sistema">
+    <Layout title="Calash" subtitle="Acesse o painel para gerenciar o sistema" showUserMenu={false}>
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-600 text-xs p-3 rounded-xl mb-4 text-center font-medium">
           {error}

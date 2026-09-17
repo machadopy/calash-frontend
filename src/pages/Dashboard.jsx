@@ -23,6 +23,13 @@ export default function Dashboard() {
         >
           Gerenciar procedimentos
         </Link>
+
+        <Link
+          to={`/${slug}/working-hours`}
+          className="block w-full border border-[#779FA3] text-[#779FA3] hover:bg-[#F4FBFC] text-center p-3 rounded-xl text-sm font-semibold transition-all"
+        >
+          Configurar expediente
+        </Link>
         
         <button 
           onClick={() => {

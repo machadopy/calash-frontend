@@ -20,7 +20,7 @@ export default function Register() {
     setErro(null)
     try {
       await api.post('/auth/register/', formulario)
-      navigate('/', { state: { from: location.state?.from, registered: true } })
+      navigate('/', { state: { from: location.state?.from || '/calash', registered: true } })
     } catch {
       setErro('Não foi possível criar a conta. Verifique os dados informados.')
     } finally {
@@ -29,7 +29,7 @@ export default function Register() {
   }
 
   return (
-    <Layout title="Criar conta" subtitle="Cadastre-se para solicitar seu atendimento">
+    <Layout title="Criar conta" subtitle="Cadastre-se para solicitar seu atendimento" showUserMenu={false}>
       <form onSubmit={handleSubmit} className="space-y-4">
         {['name', 'email', 'phone', 'password'].map((campo) => (
           <div key={campo}>

@@ -1,0 +1,78 @@
+.working-hours-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.working-hours-intro {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.working-hours-day {
+  padding: 12px;
+  border: 1px solid #d5ebeb;
+  border-radius: 12px;
+}
+
+.working-hours-day-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.working-hours-feedback {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+}
+
+.working-hours-feedback.success {
+  color: #16a34a;
+}
+
+.working-hours-feedback.error {
+  color: #ef4444;
+}
+
+.working-hours-save {
+  width: 100%;
+  padding: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  background: #95c6cc;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.working-hours-save:hover {
+  background: #779fa3;
+}
+
+.working-hours-save:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.working-hours-back {
+  display: block;
+  color: #779fa3;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.working-hours-back:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 420px) {
+  .working-hours-day-fields {
+    grid-template-columns: 1fr;
+  }
+}
