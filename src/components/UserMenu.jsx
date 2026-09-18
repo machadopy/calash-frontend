@@ -61,7 +61,14 @@ export default function UserMenu() {
       {aberto && (
         <div className="user-menu-dropdown">
           <div className="user-menu-name">{user.name || user.email}</div>
+          <Link to={user.is_professional ? `/${destino}/dashboard` : `/${destino}`} onClick={() => setAberto(false)}>Home</Link>
           <Link to={`/${destino}/perfil`} onClick={() => setAberto(false)}>Perfil</Link>
+          {user.is_professional && (
+            <>
+              <Link to={`/${destino}/procedimentos`} onClick={() => setAberto(false)}>Procedimentos</Link>
+              <Link to={`/${destino}/working-hours`} onClick={() => setAberto(false)}>Horários de atendimento</Link>
+            </>
+          )}
           {temAgendamentosAbertos && (
             <Link to={`/${destino}/agendamentos`} onClick={() => setAberto(false)}>Agendamentos</Link>
           )}

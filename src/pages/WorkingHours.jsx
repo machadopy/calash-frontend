@@ -19,6 +19,8 @@ const expedienteInicial = dias.map((dia) => ({
   enabled: false,
   start_time: '10:00',
   end_time: '20:00',
+  lunch_start_time: '12:00',
+  lunch_end_time: '13:00',
   slot_interval_minutes: 60,
 }))
 
@@ -29,10 +31,13 @@ export default function WorkingHours() {
   const [salvando, setSalvando] = useState(false)
   const [mensagem, setMensagem] = useState(null)
   const [erro, setErro] = useState(null)
+  const [almocoPadrao, setAlmocoPadrao] = useState({ start: '12:00', end: '13:00' })
 
   useEffect(() => {
     api.get('/services/working-hours/')
       .then(({ data }) => {
+        const primeiroAlmoco = data.find((item) => item.lunch_start_time && item.lunch_end_time)
+        if (primeiroAlmoco) setAlmocoPadrao({ start: primeiroAlmoco.lunch_start_time.slice(0, 5), end: primeiroAlmoco.lunch_end_time.slice(0, 5) })
         setExpediente(expedienteInicial.map((dia) => {
           const configuracao = data.find((item) => item.weekday === dia.weekday)
           return configuracao ? { ...dia, enabled: true, ...configuracao } : dia
@@ -48,6 +53,16 @@ export default function WorkingHours() {
     )))
   }
 
+  const alterarAlmocoPadrao = (campo, valor) => {
+    const novoAlmoco = { ...almocoPadrao, [campo]: valor }
+    setAlmocoPadrao(novoAlmoco)
+    setExpediente((atual) => atual.map((dia) => ({
+      ...dia,
+      lunch_start_time: novoAlmoco.start,
+      lunch_end_time: novoAlmoco.end,
+    })))
+  }
+
   const salvar = async (event) => {
     event.preventDefault()
     setSalvando(true)
@@ -57,10 +72,12 @@ export default function WorkingHours() {
     try {
       await api.put('/services/working-hours/', expediente
         .filter((dia) => dia.enabled)
-        .map(({ weekday, start_time, end_time, slot_interval_minutes }) => ({
+        .map(({ weekday, start_time, end_time, lunch_start_time, lunch_end_time, slot_interval_minutes }) => ({
           weekday,
           start_time,
           end_time,
+          lunch_start_time,
+          lunch_end_time,
           slot_interval_minutes: Number(slot_interval_minutes),
         })))
       setMensagem('Expediente salvo com sucesso.')
@@ -79,8 +96,23 @@ export default function WorkingHours() {
         <form onSubmit={salvar} className="working-hours-form">
           <p className="working-hours-intro">
             O intervalo mínimo define de quanto em quanto tempo um novo horário será oferecido.
-            A duração do atendimento fica definida em cada procedimento.
+            A duração do atendimento fica definida em cada procedimento. O almoço padrão é das 12:00 às 13:00 e pode ser alterado em cada dia.
           </p>
+
+          <section className="working-hours-lunch-default">
+            <div>
+              <strong>Almoço padrão</strong>
+              <span>Aplicado aos dias ativos. Para trocar somente uma data, clique no horário da agenda.</span>
+            </div>
+            <div className="working-hours-lunch-fields">
+              <label className="text-[10px] text-slate-500 uppercase">Início
+                <input type="time" value={almocoPadrao.start} onChange={(event) => alterarAlmocoPadrao('start', event.target.value)} className="mt-1 w-full p-2 border border-[#D5EBEB] rounded-lg text-sm" />
+              </label>
+              <label className="text-[10px] text-slate-500 uppercase">Fim
+                <input type="time" value={almocoPadrao.end} onChange={(event) => alterarAlmocoPadrao('end', event.target.value)} className="mt-1 w-full p-2 border border-[#D5EBEB] rounded-lg text-sm" />
+              </label>
+            </div>
+          </section>
 
           {expediente.map((dia) => (
             <div key={dia.weekday} className="working-hours-day">
@@ -102,6 +134,14 @@ export default function WorkingHours() {
                   <label className="text-[10px] text-slate-500 uppercase">
                     Fim
                     <input type="time" value={dia.end_time.slice(0, 5)} onChange={(event) => alterarDia(dia.weekday, 'end_time', event.target.value)} required className="mt-1 w-full p-2 border border-[#D5EBEB] rounded-lg text-sm" />
+                  </label>
+                  <label className="text-[10px] text-slate-500 uppercase">
+                    Início do almoço
+                    <input type="time" value={dia.lunch_start_time.slice(0, 5)} onChange={(event) => alterarDia(dia.weekday, 'lunch_start_time', event.target.value)} required className="mt-1 w-full p-2 border border-[#D5EBEB] rounded-lg text-sm" />
+                  </label>
+                  <label className="text-[10px] text-slate-500 uppercase">
+                    Fim do almoço
+                    <input type="time" value={dia.lunch_end_time.slice(0, 5)} onChange={(event) => alterarDia(dia.weekday, 'lunch_end_time', event.target.value)} required className="mt-1 w-full p-2 border border-[#D5EBEB] rounded-lg text-sm" />
                   </label>
                   <label className="text-[10px] text-slate-500 uppercase">
                     Intervalo

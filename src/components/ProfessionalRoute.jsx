@@ -23,7 +23,7 @@ export default function ProfessionalRoute({ children }) {
       })
   }, [])
 
-  if (state.loading) return <div className="min-h-screen bg-[#F4FBFC]" />
+  if (state.loading) return <div className="flex min-h-screen items-center justify-center bg-[#F4FBFC] p-6 text-sm text-slate-500">Validando acesso profissional...</div>
   if (!state.user) return <Navigate to="/" state={{ from: location.pathname }} replace />
   if (!state.user.is_professional) return <Navigate to={slug ? `/${slug}` : '/'} replace />
   if (state.user.professional_slug !== slug) {

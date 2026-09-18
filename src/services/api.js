@@ -2,14 +2,13 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api/', // O endereço base que vimos no seu Django
+  timeout: 10000,
 });
 
 api.interceptors.request.use((config) => {
   const accessToken = localStorage.getItem('accessToken')
 
-  const isPublicRequest = config.url?.startsWith('/public/')
-
-  if (accessToken && !isPublicRequest) {
+  if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`
   }
 

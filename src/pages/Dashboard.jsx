@@ -18,7 +18,7 @@ export default function Dashboard() {
         <AgendaGrid isProfessional={true} />
 
         <Link
-          to={`/${slug}/servicos`}
+          to={`/${slug}/procedimentos`}
           className="block w-full bg-[#779FA3] hover:bg-[#5F898E] text-white text-center p-3 rounded-xl text-sm font-semibold transition-all shadow-md"
         >
           Gerenciar procedimentos

@@ -11,6 +11,42 @@
   line-height: 1.6;
 }
 
+.working-hours-lunch-default {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  background: #fff8ec;
+  border: 1px solid #f2c27b;
+  border-radius: 12px;
+}
+
+.working-hours-lunch-default strong,
+.working-hours-lunch-default span {
+  display: block;
+}
+
+.working-hours-lunch-default strong {
+  color: #8a5a24;
+  font-size: 13px;
+}
+
+.working-hours-lunch-default span {
+  max-width: 260px;
+  margin-top: 4px;
+  color: #9a7a52;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.working-hours-lunch-fields {
+  display: grid;
+  min-width: 190px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
 .working-hours-day {
   padding: 12px;
   border: 1px solid #d5ebeb;
@@ -19,7 +55,7 @@
 
 .working-hours-day-fields {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   margin-top: 12px;
 }
@@ -72,6 +108,15 @@
 }
 
 @media (max-width: 420px) {
+  .working-hours-lunch-default {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .working-hours-lunch-fields {
+    min-width: 0;
+  }
+
   .working-hours-day-fields {
     grid-template-columns: 1fr;
   }

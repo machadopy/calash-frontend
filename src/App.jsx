@@ -21,6 +21,7 @@ export default function App() {
         {/* Rota do Painel */}
         <Route path="/:slug" element={<AgendaPublica />} />
         <Route path="/:slug/dashboard" element={<ProfessionalRoute><Dashboard /></ProfessionalRoute>} />
+        <Route path="/:slug/procedimentos" element={<ProfessionalRoute><Servicos /></ProfessionalRoute>} />
         <Route path="/:slug/servicos" element={<ProfessionalRoute><Servicos /></ProfessionalRoute>} />
         <Route path="/:slug/services" element={<ProfessionalRoute><Servicos /></ProfessionalRoute>} />
         <Route path="/:slug/working-hours" element={<ProfessionalRoute><WorkingHours /></ProfessionalRoute>} />
