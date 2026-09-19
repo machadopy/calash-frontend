@@ -21,8 +21,15 @@ export default function Register() {
     try {
       await api.post('auth/register/', formulario)
       navigate('/', { state: { from: location.state?.from || '/calash', registered: true } })
-    } catch {
-      setErro('Não foi possível criar a conta. Verifique os dados informados.')
+    } catch (err) {
+      const emailErrors = err.response?.data?.email
+      const emailJaCadastrado = Array.isArray(emailErrors)
+        ? emailErrors.some((mensagem) => /already|exists|cadastrado|registrado/i.test(mensagem))
+        : /already|exists|cadastrado|registrado/i.test(emailErrors || '')
+
+      setErro(emailJaCadastrado
+        ? 'Este e-mail já está cadastrado. Use outro e-mail ou faça login.'
+        : 'Não foi possível criar a conta. Verifique os dados informados.')
     } finally {
       setSalvando(false)
     }

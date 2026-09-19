@@ -18,16 +18,20 @@ export default function Login() {
       .then(({ data: user }) => {
         const origem = location.state?.from
         const slugDaOrigem = origem?.match(/^\/([^/]+)/)?.[1]
-
-        if (user.is_superuser) {
-          window.location.assign('http://127.0.0.1:8000/admin/')
-          return
-        }
+        const destinoProfissional = origem && origem !== '/calash'
+          ? origem
+          : `/${user.professional_slug}/dashboard`
 
         const destino = user.is_professional
-          ? (origem || `/${user.professional_slug}/dashboard`)
+          ? destinoProfissional
+          : user.is_superuser
+          ? 'http://127.0.0.1:8000/admin/'
           : (slugDaOrigem ? `/${slugDaOrigem}` : '/calash')
-        navigate(destino, { replace: true })
+        if (destino.startsWith('http')) {
+          window.location.assign(destino)
+        } else {
+          navigate(destino, { replace: true })
+        }
       })
       .catch(() => {
         localStorage.removeItem('accessToken')
@@ -54,10 +58,13 @@ export default function Login() {
       const { data: user } = await api.get('/auth/me/')
       const origem = location.state?.from
       const slugDaOrigem = origem?.match(/^\/([^/]+)/)?.[1]
-      const destino = user.is_superuser
+      const destinoProfissional = origem && origem !== '/calash'
+        ? origem
+        : `/${user.professional_slug}/dashboard`
+      const destino = user.is_professional
+        ? destinoProfissional
+        : user.is_superuser
         ? 'http://127.0.0.1:8000/admin/'
-        : user.is_professional
-        ? (origem || `/${user.professional_slug}/dashboard`)
         : (slugDaOrigem ? `/${slugDaOrigem}` : '/calash')
       if (destino.startsWith('http')) {
         window.location.assign(destino)
