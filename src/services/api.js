@@ -1,18 +1,18 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api/', // O endereço base que vimos no seu Django
+  baseURL: '/api/', // Caminho relativo: o Nginx da front-end redireciona para a VPS de back-end
   timeout: 10000,
 });
 
 api.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem('accessToken')
+  const accessToken = localStorage.getItem('accessToken');
 
   if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  return config
-})
+  return config;
+});
 
 export default api;
