@@ -3,6 +3,14 @@ import { useEffect, useState } from 'react'
 import api from '../services/api'
 import Layout from '../components/Layout'
 
+// Caminho relativo: o navegador completa com o domínio atual e o Nginx
+// encaminha /admin/ para o Django. Funciona em produção e (com proxy no Vite) em dev.
+const ADMIN_URL = '/admin/'
+
+// Destinos que precisam recarregar a página inteira (fora do SPA React).
+const ehLinkExterno = (destino) =>
+  destino.startsWith('http') || destino.startsWith(ADMIN_URL)
+
 export default function Login() {
   const navigate = useNavigate() // Navegador inicializado aqui
   const location = useLocation()
@@ -25,9 +33,9 @@ export default function Login() {
         const destino = user.is_professional
           ? destinoProfissional
           : user.is_superuser
-          ? 'http://127.0.0.1:8000/admin/'
+          ? ADMIN_URL
           : (slugDaOrigem ? `/${slugDaOrigem}` : '/calash')
-        if (destino.startsWith('http')) {
+        if (ehLinkExterno(destino)) {
           window.location.assign(destino)
         } else {
           navigate(destino, { replace: true })
@@ -64,14 +72,14 @@ export default function Login() {
       const destino = user.is_professional
         ? destinoProfissional
         : user.is_superuser
-        ? 'http://127.0.0.1:8000/admin/'
+        ? ADMIN_URL
         : (slugDaOrigem ? `/${slugDaOrigem}` : '/calash')
-      if (destino.startsWith('http')) {
+      if (ehLinkExterno(destino)) {
         window.location.assign(destino)
       } else {
         navigate(destino, { replace: true })
       }
-      
+
     } catch (err) {
       console.error(err)
       localStorage.removeItem('accessToken')
