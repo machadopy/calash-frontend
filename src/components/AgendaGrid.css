@@ -99,7 +99,15 @@
 }
 
 .agenda-grid-status {
+  min-width: 0;
   text-align: center;
+}
+
+.agenda-approval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
 }
 
 .agenda-modal-backdrop {
@@ -312,6 +320,18 @@
 
   .agenda-grid-header,
   .agenda-grid-row {
-    grid-template-columns: 64px 1fr 82px;
+    grid-template-columns: 54px minmax(0, 1fr) 96px;
+  }
+
+  .agenda-approval-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .agenda-approval-actions button,
+  .agenda-approval-actions span {
+    width: 100%;
+    padding: 4px 2px;
+    font-size: 10px;
   }
 }

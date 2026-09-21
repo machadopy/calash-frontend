@@ -116,9 +116,10 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
           : listaAgendamentos.reduce((agenda, agendamento) => {
           const inicio = new Date(agendamento.start_datetime)
           const fim = agendamento.end_datetime ? new Date(agendamento.end_datetime) : null
+          const servico = servicos.find((item) => item.id === agendamento.service)
           const duracao = fim
             ? Math.max(1, Math.round((fim.getTime() - inicio.getTime()) / 60000))
-            : agendamento.service_duration_minutes || 60
+            : agendamento.service_duration_minutes || servico?.duration_minutes || 60
           const blocos = Math.ceil(duracao / 60)
           for (let bloco = 0; bloco < blocos; bloco += 1) {
             const horario = new Date(inicio.getTime() + bloco * 60 * 60 * 1000)
@@ -153,7 +154,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
 
     carregarAgendamentos()
     return () => { ativo = false }
-  }, [dataSelecionada, publicSlug])
+  }, [dataSelecionada, publicSlug, servicos])
 
   const handleCliqueHorario = (horario) => {
     const conflito = agendamentos[horario]
@@ -258,7 +259,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
     if (!servicoId || !horarioSelecionado) return
 
     if (!isProfessional && !localStorage.getItem('accessToken')) {
-      navigate('/', { state: { from: window.location.pathname } })
+      navigate('/', { state: { from: window.location.pathname, date: dataSelecionada } })
       return
     }
 
@@ -281,18 +282,40 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
           return
         }
       }
-      await api.post(
+      const servicoSelecionado = servicos.find((servico) => String(servico.id) === servicoId)
+      const response = await api.post(
         publicSlug ? `/public/${publicSlug}/appointments/` : '/appointments/',
         { service: Number(servicoId), start_datetime: `${dataSelecionada}T${horarioSelecionado}:00`, ...(isProfessional ? { client: clientId } : {}) }
       )
 
-      setAgendamentos((atuais) => ({
-        ...atuais,
-        [horarioSelecionado]: {
-          status: isProfessional ? 'scheduled' : 'pending',
-          procedimento: servicos.find((servico) => String(servico.id) === servicoId)?.name
+      const duracao = servicoSelecionado?.duration_minutes || 60
+      const blocos = Math.ceil(duracao / 60)
+      const indiceInicial = horarios.indexOf(horarioSelecionado)
+      const agendamentoId = response.data.id || response.data.appointment_id
+      const novoAgendamento = {
+        id: agendamentoId,
+        status: isProfessional ? 'scheduled' : 'pending',
+        cliente: response.data.client_name,
+        procedimento: servicoSelecionado?.name,
+        duracao,
+        duracaoFormatada: formatarDuracao(duracao),
+        serviceId: Number(servicoId),
+      }
+
+      setAgendamentos((atuais) => {
+        const atualizados = { ...atuais }
+        for (let bloco = 0; bloco < blocos; bloco += 1) {
+          const horario = horarios[indiceInicial + bloco]
+          if (!horario) break
+          atualizados[horario] = {
+            ...novoAgendamento,
+            inicio: bloco === 0,
+            fim: bloco === blocos - 1,
+            unico: blocos === 1,
+          }
         }
-      }))
+        return atualizados
+      })
       setMensagemModal(isProfessional ? 'Agendamento criado com sucesso.' : 'Solicitação enviada. Aguarde a aprovação da profissional.')
     } catch (error) {
       const detalhes = error.response?.data
@@ -328,6 +351,18 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
       ))
     } catch {
       setErro('Não foi possível recusar o agendamento.')
+    }
+  }
+
+  const removerAgendamento = async (id) => {
+    if (!window.confirm('Deseja remover este agendamento?')) return
+    try {
+      await api.delete(`/appointments/${id}/`)
+      setAgendamentos((atuais) => Object.fromEntries(
+        Object.entries(atuais).filter(([, agendamento]) => agendamento.id !== id)
+      ))
+    } catch {
+      setErro('Não foi possível remover o agendamento.')
     }
   }
 
@@ -397,8 +432,8 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
                       Em Análise
                     </span>
                   )}
-                  {!publicSlug && item?.status === 'pending' && isProfessional && (
-                    <div className="flex gap-1">
+                  {!publicSlug && item?.status === 'pending' && isProfessional && item.inicio && (
+                    <div className="agenda-approval-actions">
                       <button type="button" onClick={(event) => { event.stopPropagation(); aprovarAgendamento(item.id) }} className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-semibold">
                         Aprovar
                       </button>
@@ -407,10 +442,15 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
                       </button>
                     </div>
                   )}
-                  {!publicSlug && item?.status === 'scheduled' && (
-                    <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-semibold">
-                      Agendado
-                    </span>
+                  {!publicSlug && item?.status === 'scheduled' && item.inicio && (
+                    <div className="agenda-approval-actions">
+                      <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-semibold">
+                        Agendado
+                      </span>
+                      <button type="button" onClick={(event) => { event.stopPropagation(); removerAgendamento(item.id) }} className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-semibold">
+                        Remover
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

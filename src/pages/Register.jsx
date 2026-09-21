@@ -20,7 +20,7 @@ export default function Register() {
     setErro(null)
     try {
       await api.post('auth/register/', formulario)
-      navigate('/', { state: { from: location.state?.from || '/calash', registered: true } })
+      navigate('/', { state: { ...location.state, from: location.state?.from || '/calash', registered: true } })
     } catch (err) {
       const emailErrors = err.response?.data?.email
       const emailJaCadastrado = Array.isArray(emailErrors)

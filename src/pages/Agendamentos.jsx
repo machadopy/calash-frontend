@@ -8,6 +8,16 @@ export default function Agendamentos() {
 	const [agendamentos, setAgendamentos] = useState([])
 	const [erro, setErro] = useState(null)
 
+	const removerAgendamento = async (id) => {
+		if (!window.confirm('Deseja remover este agendamento?')) return
+		try {
+			await api.delete(`/appointments/${id}/`)
+			setAgendamentos((atuais) => atuais.filter((agendamento) => agendamento.id !== id))
+		} catch {
+			setErro('Não foi possível remover o agendamento.')
+		}
+	}
+
 	useEffect(() => {
 		api.get('/appointments/')
 			.then(({ data }) => setAgendamentos(
@@ -26,6 +36,7 @@ export default function Agendamentos() {
 						<p className="font-medium text-slate-700">{agendamento.service_name || 'Atendimento'}</p>
 						<p className="text-xs text-slate-500">{new Date(agendamento.start_datetime).toLocaleString('pt-BR')}</p>
 						<p className="text-xs text-[#779FA3] mt-1">{agendamento.status}</p>
+						<button type="button" onClick={() => removerAgendamento(agendamento.id)} className="mt-2 text-xs text-red-500 hover:underline">Remover agendamento</button>
 					</article>
 				))}
 				<Link to={`/${slug}/dashboard`} className="block text-center text-sm text-[#779FA3] hover:underline pt-3">Voltar</Link>

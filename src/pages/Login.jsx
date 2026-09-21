@@ -38,7 +38,7 @@ export default function Login() {
         if (ehLinkExterno(destino)) {
           window.location.assign(destino)
         } else {
-          navigate(destino, { replace: true })
+          navigate(destino, { replace: true, state: location.state })
         }
       })
       .catch(() => {
@@ -77,7 +77,7 @@ export default function Login() {
       if (ehLinkExterno(destino)) {
         window.location.assign(destino)
       } else {
-        navigate(destino, { replace: true })
+        navigate(destino, { replace: true, state: location.state })
       }
 
     } catch (err) {

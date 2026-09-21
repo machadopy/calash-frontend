@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import api from '../services/api'
 import './AgendaPublica.css'
 import UserMenu from '../components/UserMenu'
@@ -7,8 +7,10 @@ import AgendaGrid from '../components/AgendaGrid'
 
 export default function AgendaPublica() {
   const { slug } = useParams()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [agenda, setAgenda] = useState(null)
-  const [data, setData] = useState(new Date().toISOString().split('T')[0])
+  const [data, setData] = useState(() => location.state?.date || new Date().toISOString().split('T')[0])
   const [mensagem, setMensagem] = useState(null)
   const [naoEncontrada, setNaoEncontrada] = useState(false)
   const [estaLogado, setEstaLogado] = useState(Boolean(localStorage.getItem('accessToken')))
@@ -64,7 +66,7 @@ export default function AgendaPublica() {
           {estaLogado ? (
             <button type="button" onClick={logout} className="block w-full text-center text-sm text-red-500 hover:underline">Sair</button>
           ) : (
-            <Link to="/" state={{ from: `/${slug}` }} className="block text-center text-sm text-[#779FA3] hover:underline">Entrar</Link>
+            <Link to="/" state={{ from: `/${slug}`, date: data }} className="block text-center text-sm text-[#779FA3] hover:underline">Entrar</Link>
           )}
         </div>
       </div>
