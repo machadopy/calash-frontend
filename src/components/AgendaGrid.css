@@ -104,8 +104,8 @@
 }
 
 .agenda-approval-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   justify-content: center;
   gap: 4px;
 }
@@ -324,8 +324,7 @@
   }
 
   .agenda-approval-actions {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
   }
 
   .agenda-approval-actions button,
