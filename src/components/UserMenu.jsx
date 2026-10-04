@@ -61,9 +61,7 @@ export default function UserMenu() {
     navigate('/', { replace: true })
   }
 
-  if (!user) return null
-
-  const destino = slug || user.professional_slug || 'calash'
+  const destino = slug || user?.professional_slug || 'calash'
 
   return (
     <div className="user-menu" ref={menuRef}>
@@ -71,7 +69,7 @@ export default function UserMenu() {
         type="button"
         className="user-menu-trigger"
         onClick={() => setAberto((atual) => !atual)}
-        aria-label="Abrir menu do usuário"
+        aria-label={user ? 'Abrir menu do usuário' : 'Abrir menu de acesso'}
         aria-expanded={aberto}
       >
         <svg className="user-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -82,20 +80,29 @@ export default function UserMenu() {
 
       {aberto && (
         <div className="user-menu-dropdown">
-          <div className="user-menu-name">{user.name || user.email}</div>
-          <Link to={user.is_professional ? `/${destino}/dashboard` : `/${destino}`} onClick={() => setAberto(false)}>Home</Link>
-          <Link to={`/${destino}/perfil`} onClick={() => setAberto(false)}>Perfil</Link>
-          {user.is_professional && (
+          {!user ? (
             <>
-              <Link to={`/${destino}/procedimentos`} onClick={() => setAberto(false)}>Procedimentos</Link>
-              <Link to={`/${destino}/working-hours`} onClick={() => setAberto(false)}>Horários de atendimento</Link>
-              <Link to={`/${destino}/anamneses`} onClick={() => setAberto(false)}>Fichas de anamnese</Link>
+              <Link to="/login" onClick={() => setAberto(false)}>Entrar</Link>
+              <Link to="/register" onClick={() => setAberto(false)}>Criar conta</Link>
+            </>
+          ) : (
+            <>
+              <div className="user-menu-name">{user.name || user.email}</div>
+              <Link to={user.is_professional ? `/${destino}/dashboard` : `/${destino}`} onClick={() => setAberto(false)}>Home</Link>
+              <Link to={`/${destino}/perfil`} onClick={() => setAberto(false)}>Perfil</Link>
+              {user.is_professional && (
+                <>
+                  <Link to={`/${destino}/procedimentos`} onClick={() => setAberto(false)}>Procedimentos</Link>
+                  <Link to={`/${destino}/working-hours`} onClick={() => setAberto(false)}>Horários de atendimento</Link>
+                  <Link to={`/${destino}/anamneses`} onClick={() => setAberto(false)}>Fichas de anamnese</Link>
+                </>
+              )}
+              {temAgendamentosAbertos && (
+                <Link to={`/${destino}/agendamentos`} onClick={() => setAberto(false)}>Agendamentos</Link>
+              )}
+              <button type="button" onClick={logout}>Sair</button>
             </>
           )}
-          {temAgendamentosAbertos && (
-            <Link to={`/${destino}/agendamentos`} onClick={() => setAberto(false)}>Agendamentos</Link>
-          )}
-          <button type="button" onClick={logout}>Sair</button>
         </div>
       )}
     </div>
