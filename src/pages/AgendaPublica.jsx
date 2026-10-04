@@ -66,7 +66,7 @@ export default function AgendaPublica() {
           {estaLogado ? (
             <button type="button" onClick={logout} className="block w-full text-center text-sm text-red-500 hover:underline">Sair</button>
           ) : (
-            <Link to="/" state={{ from: `/${slug}`, date: data }} className="block text-center text-sm text-[#779FA3] hover:underline">Entrar</Link>
+            <Link to="/login" state={{ from: `/${slug}`, date: data }} className="block text-center text-sm text-[#779FA3] hover:underline">Entrar</Link>
           )}
         </div>
       </div>

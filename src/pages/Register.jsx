@@ -20,7 +20,7 @@ export default function Register() {
     setErro(null)
     try {
       await api.post('auth/register/', formulario)
-      navigate('/', { state: { ...location.state, from: location.state?.from || '/calash', registered: true } })
+      navigate('/login', { state: { ...location.state, from: location.state?.from || '/calash', registered: true } })
     } catch (err) {
       const emailErrors = err.response?.data?.email
       const emailJaCadastrado = Array.isArray(emailErrors)
@@ -57,7 +57,7 @@ export default function Register() {
         <button type="submit" disabled={salvando} className="w-full bg-[#95C6CC] hover:bg-[#779FA3] text-white p-3 rounded-xl text-sm font-semibold disabled:opacity-70">
           {salvando ? 'Criando...' : 'Criar conta'}
         </button>
-        <Link to="/" state={location.state} className="block text-center text-sm text-[#779FA3] hover:underline">Já tenho uma conta</Link>
+        <Link to="/login" state={location.state} className="block text-center text-sm text-[#779FA3] hover:underline">Já tenho uma conta</Link>
       </form>
     </Layout>
   )

@@ -21,7 +21,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
   const [clientes, setClientes] = useState([])
   const [clienteManualAtivo, setClienteManualAtivo] = useState(false)
   const [clienteSelecionada, setClienteSelecionada] = useState('')
-  const [clienteManual, setClienteManual] = useState({ name: '', email: '', phone: '' })
+  const [clienteManual, setClienteManual] = useState({ name: '' })
   const [expediente, setExpediente] = useState([])
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState(null)
@@ -34,7 +34,26 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
   const [servicoId, setServicoId] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [mensagemModal, setMensagemModal] = useState(null)
+  const [menuAgendamentoId, setMenuAgendamentoId] = useState(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (menuAgendamentoId === null) return undefined
+
+    const fecharMenu = (event) => {
+      if (!event.target.closest('.agenda-row-menu, .agenda-row-menu-dropdown')) setMenuAgendamentoId(null)
+    }
+    const fecharComEscape = (event) => {
+      if (event.key === 'Escape') setMenuAgendamentoId(null)
+    }
+
+    document.addEventListener('mousedown', fecharMenu)
+    document.addEventListener('keydown', fecharComEscape)
+    return () => {
+      document.removeEventListener('mousedown', fecharMenu)
+      document.removeEventListener('keydown', fecharComEscape)
+    }
+  }, [menuAgendamentoId])
 
   const dataLocal = new Date(`${dataSelecionada}T00:00:00`)
   const weekday = dataLocal.getDay() === 0 ? 6 : dataLocal.getDay() - 1
@@ -250,7 +269,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
     setAgendamentoEditando(null)
     setClienteManualAtivo(false)
     setClienteSelecionada('')
-    setClienteManual({ name: '', email: '', phone: '' })
+    setClienteManual({ name: '' })
     setMensagemModal(null)
   }
 
@@ -259,7 +278,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
     if (!servicoId || !horarioSelecionado) return
 
     if (!isProfessional && !localStorage.getItem('accessToken')) {
-      navigate('/', { state: { from: window.location.pathname, date: dataSelecionada } })
+      navigate('/login', { state: { from: window.location.pathname, date: dataSelecionada } })
       return
     }
 
@@ -270,7 +289,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
       let clientId = null
       if (isProfessional) {
         if (clienteManualAtivo) {
-          const { data } = await api.post('/auth/clients/', clienteManual)
+          const { data } = await api.post('/auth/clients/', { name: clienteManual.name })
           clientId = data.id
           setClientes((atuais) => [...atuais, data])
         } else {
@@ -366,6 +385,37 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
     }
   }
 
+  const sobreporAgendamento = async () => {
+    const inicioNovo = Number(horarioSelecionado.slice(0, 2)) * 60 + Number(horarioSelecionado.slice(3, 5))
+    const servicoNovo = servicos.find((servico) => String(servico.id) === servicoId)
+    const fimNovo = inicioNovo + Number(servicoNovo?.duration_minutes || duracaoAgendamento || 60)
+    const agendamentoExistente = Object.entries(agendamentos)
+      .filter(([, agendamento]) => agendamento?.id && agendamento.inicio)
+      .find(([horario]) => {
+        const inicioExistente = Number(horario.slice(0, 2)) * 60 + Number(horario.slice(3, 5))
+        return inicioExistente >= inicioNovo && inicioExistente < fimNovo
+      })?.[1]
+
+    if (!agendamentoExistente?.id) {
+      setMensagemModal('Não foi possível identificar o agendamento existente.')
+      return
+    }
+
+    setSalvando(true)
+    try {
+      await api.delete(`/appointments/${agendamentoExistente.id}/`)
+      setAgendamentos((atuais) => Object.fromEntries(
+        Object.entries(atuais).filter(([, agendamento]) => agendamento.id !== agendamentoExistente.id)
+      ))
+      setMensagemModal(null)
+      setAgendamentoEditando(null)
+    } catch {
+      setMensagemModal('Não foi possível sobrepor o agendamento existente.')
+    } finally {
+      setSalvando(false)
+    }
+  }
+
   return (
     <div className="agenda-grid">
       {/* Seletor de Datas */}
@@ -402,7 +452,10 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
             return (
               <div
                 key={horario}
-                onClick={() => handleCliqueHorario(horario)}
+                onClick={(event) => {
+                  if (event.target.closest('.agenda-row-menu, .agenda-row-menu-dropdown')) return
+                  handleCliqueHorario(horario)
+                }}
                 onKeyDown={(event) => {
                   if ((event.key === 'Enter' || event.key === ' ') && (!item || (item.isLunch && isProfessional))) {
                     event.preventDefault()
@@ -419,7 +472,9 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
                     <>
                       {item.inicio ? (
                         <>
-                          <div>{item.cliente}</div>
+                          <div className="agenda-client-line">
+                            <span>{item.cliente}</span>
+                          </div>
                           <div className="text-xs text-slate-400">{item.procedimento} · {item.duracaoFormatada}</div>
                         </>
                       ) : <div className="text-xs text-slate-400">Em atendimento</div>}
@@ -433,26 +488,49 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
                     </span>
                   )}
                   {!publicSlug && item?.status === 'pending' && isProfessional && item.inicio && (
-                    <div className="agenda-approval-actions">
-                      <button type="button" onClick={(event) => { event.stopPropagation(); aprovarAgendamento(item.id) }} className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-semibold">
-                        Aprovar
-                      </button>
-                      <button type="button" onClick={(event) => { event.stopPropagation(); recusarAgendamento(item.id) }} className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-semibold">
-                        Recusar
-                      </button>
+                    <div className="agenda-status-actions">
+                      <span className="agenda-status-pending">Em análise</span>
+                      <div className="agenda-row-menu">
+                        <button
+                          type="button"
+                          className="agenda-row-menu-trigger"
+                          onClick={(event) => { event.stopPropagation(); setMenuAgendamentoId((atual) => atual === item.id ? null : item.id) }}
+                          aria-label="Abrir ações do agendamento"
+                          aria-expanded={menuAgendamentoId === item.id}
+                        >
+                          <span aria-hidden="true">⋮</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                   {!publicSlug && item?.status === 'scheduled' && item.inicio && (
-                    <div className="agenda-approval-actions">
-                      <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-semibold">
-                        Agendado
-                      </span>
-                      <button type="button" onClick={(event) => { event.stopPropagation(); removerAgendamento(item.id) }} className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-semibold">
-                        Remover
-                      </button>
+                    <div className="agenda-status-actions">
+                      <span className="agenda-status-scheduled">Agendado</span>
+                      <div className="agenda-row-menu">
+                        <button
+                          type="button"
+                          className="agenda-row-menu-trigger"
+                          onClick={(event) => { event.stopPropagation(); setMenuAgendamentoId((atual) => atual === item.id ? null : item.id) }}
+                          aria-label="Abrir ações do agendamento"
+                          aria-expanded={menuAgendamentoId === item.id}
+                        >
+                          <span aria-hidden="true">⋮</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
+                {!publicSlug && menuAgendamentoId === item?.id && item?.inicio && item?.status === 'pending' && isProfessional && (
+                  <div className="agenda-row-menu-dropdown">
+                    <button type="button" onClick={(event) => { event.stopPropagation(); aprovarAgendamento(item.id); setMenuAgendamentoId(null) }}>Aprovar agendamento</button>
+                    <button type="button" className="danger" onClick={(event) => { event.stopPropagation(); recusarAgendamento(item.id); setMenuAgendamentoId(null) }}>Recusar agendamento</button>
+                  </div>
+                )}
+                {!publicSlug && menuAgendamentoId === item?.id && item?.inicio && item?.status === 'scheduled' && isProfessional && (
+                  <div className="agenda-row-menu-dropdown">
+                    <button type="button" className="danger" onClick={(event) => { event.stopPropagation(); removerAgendamento(item.id); setMenuAgendamentoId(null) }}>Remover agendamento</button>
+                  </div>
+                )}
               </div>
             )
           })}
@@ -475,6 +553,11 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
             {mensagemModal ? (
               <div className="agenda-modal-feedback">
                 <p>{mensagemModal}</p>
+                {isProfessional && /já existe|existe um agendamento/i.test(mensagemModal) && (
+                  <button type="button" className="agenda-overwrite-action" onClick={sobreporAgendamento} disabled={salvando}>
+                    {salvando ? 'Sobrepondo...' : 'Sobrepor agendamento'}
+                  </button>
+                )}
                 <button type="button" onClick={fecharModal}>Voltar para a agenda</button>
               </div>
             ) : (
@@ -538,8 +621,6 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
                     {clienteManualAtivo ? (
                       <div className="agenda-client-fields">
                         <input placeholder="Nome completo" value={clienteManual.name} onChange={(event) => setClienteManual((atual) => ({ ...atual, name: event.target.value }))} required />
-                        <input type="email" placeholder="E-mail" value={clienteManual.email} onChange={(event) => setClienteManual((atual) => ({ ...atual, email: event.target.value }))} required />
-                        <input placeholder="Telefone" value={clienteManual.phone} onChange={(event) => setClienteManual((atual) => ({ ...atual, phone: event.target.value }))} required />
                       </div>
                     ) : (
                       <select value={clienteSelecionada} onChange={(event) => setClienteSelecionada(event.target.value)} required>

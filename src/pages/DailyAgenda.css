@@ -1,0 +1,16 @@
+.daily-agenda-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.daily-agenda-back {
+  color: #779fa3;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.daily-agenda-back:hover {
+  text-decoration: underline;
+}

@@ -1,10 +1,10 @@
 import './Layout.css'
 import UserMenu from './UserMenu'
 
-export default function Layout({ children, title, subtitle, showUserMenu = true }) {
+export default function Layout({ children, title, subtitle, showUserMenu = true, wide = false }) {
   return (
     <div className="layout-page">
-      <div className="layout-card">
+      <div className={`layout-card${wide ? ' layout-card-wide' : ''}`}>
         <div className="layout-header">
           {showUserMenu && <UserMenu />}
           <h1 className="layout-title">

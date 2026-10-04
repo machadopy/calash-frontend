@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import api from '../services/api'
 import Layout from '../components/Layout'
+import './Login.css'
 
 // Caminho relativo: o navegador completa com o domínio atual e o Nginx
 // encaminha /admin/ para o Django. Funciona em produção e (com proxy no Vite) em dev.
@@ -94,35 +95,35 @@ export default function Login() {
   return (
     <Layout title="Calash" subtitle="Acesse o painel para gerenciar o sistema" showUserMenu={false}>
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 text-xs p-3 rounded-xl mb-4 text-center font-medium">
+        <div className="login-error">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div className="mb-4">
-          <label className="block text-[11px] font-medium text-[#667777] mb-2 uppercase tracking-[0.5px]">
+      <form onSubmit={handleLogin} className="login-form">
+        <div className="login-field">
+          <label className="login-label">
             E-mail
           </label>
           <input 
             type="email" 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-[12px_16px] border-[1.5px] border-[#D5EBEB] rounded-[12px] text-sm text-[#2C2C2C] bg-white outline-none focus:border-[#95C6CC] focus:ring-4 focus:ring-[#95C6CC]/25 transition-all"
+            className="login-input"
             placeholder="seu@email.com"
             required
           />
         </div>
         
-        <div className="mb-4">
-          <label className="block text-[11px] font-medium text-[#667777] mb-2 uppercase tracking-[0.5px]">
+        <div className="login-field">
+          <label className="login-label">
             Senha
           </label>
           <input 
             type="password" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-[12px_16px] border-[1.5px] border-[#D5EBEB] rounded-[12px] text-sm text-[#2C2C2C] bg-white outline-none focus:border-[#95C6CC] focus:ring-4 focus:ring-[#95C6CC]/25 transition-all"
+            className="login-input"
             placeholder="••••••••"
             required
           />
@@ -131,16 +132,16 @@ export default function Login() {
         <button 
           type="submit" 
           disabled={loading}
-          className="w-full bg-[#95C6CC] hover:bg-[#779FA3] text-white border-none p-[14px] rounded-[12px] text-sm font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(149,198,204,0.3)] uppercase tracking-[0.5px] mt-2 disabled:opacity-70"
+          className="login-submit"
         >
           {loading ? "Autenticando..." : "Entrar"}
         </button>
       </form>
 
-      <div className="text-center mt-5 text-[11px] text-[#889999]">
+      <div className="login-footer">
         Sistema integrado com API Django &bull; Calash
       </div>
-      <Link to="/register" state={location.state} className="block text-center mt-3 text-sm text-[#779FA3] hover:underline">
+      <Link to="/register" state={location.state} className="login-register-link">
         Criar conta de cliente
       </Link>
     </Layout>

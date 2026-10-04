@@ -22,7 +22,7 @@ export default function AuthenticatedRoute({ children }) {
   }, [])
 
   if (state.loading) return <div className="min-h-screen bg-[#F4FBFC]" />
-  if (!state.user) return <Navigate to="/" state={{ from: location.pathname }} replace />
+  if (!state.user) return <Navigate to="/login" state={{ from: location.pathname }} replace />
 
   return children
 }
