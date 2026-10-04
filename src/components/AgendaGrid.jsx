@@ -342,7 +342,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
       const novoAgendamento = {
         id: agendamentoId,
         status: isProfessional ? 'scheduled' : 'pending',
-        cliente: response.data.client_name,
+        cliente: response.data.client_name || clienteManual.name.trim() || clienteSelecionadaDados?.name,
         procedimento: servicoSelecionado?.name,
         duracao,
         duracaoFormatada: formatarDuracao(duracao),
