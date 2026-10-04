@@ -1,7 +1,10 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import Dashboard from './pages/Dashboard' // (Se ainda não criou o Dashboard, pode ignorar essa linha por enquanto ou criar um arquivo vazio para ele)
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
+import VerifyEmail from './pages/VerifyEmail'
+import Dashboard from './pages/Dashboard'
 import Servicos from './pages/Servicos'
 import WorkingHours from './pages/WorkingHours'
 import Perfil from './pages/Perfil'
@@ -21,7 +24,10 @@ export default function App() {
         <Route path="/" element={<Navigate to="/calash" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+        <Route path="/esqueci-senha" element={<ForgotPassword />} />
+        <Route path="/redefinir-senha" element={<ResetPassword />} />
+        <Route path="/confirmar-email" element={<VerifyEmail />} />
+
         {/* Rota do Painel */}
         <Route path="/:slug" element={<HomeAgenda />} />
         <Route path="/:slug/dashboard/dia" element={<ProfessionalRoute><DailyAgenda /></ProfessionalRoute>} />

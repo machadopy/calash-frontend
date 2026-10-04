@@ -94,6 +94,12 @@ export default function Login() {
 
   return (
     <Layout title="Calash" subtitle="Acesse o painel para gerenciar o sistema" showUserMenu={false}>
+      {location.state?.notice && (
+        <div className="login-success">
+          {location.state.notice}
+        </div>
+      )}
+
       {error && (
         <div className="login-error">
           {error}
@@ -140,6 +146,11 @@ export default function Login() {
 
       <div className="login-footer">
         Sistema integrado com API Django &bull; Calash
+      </div>
+      <div className="login-links-row">
+        <Link to="/esqueci-senha" state={location.state} className="login-register-link">
+          Esqueci minha senha
+        </Link>
       </div>
       <Link to="/register" state={location.state} className="login-register-link">
         Criar conta de cliente

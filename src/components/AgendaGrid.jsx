@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
+import ResendVerificationButton from './ResendVerificationButton'
 import './AgendaGrid.css'
 
 const SERVICOS_VAZIOS = []
@@ -47,6 +48,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
   const [servicoId, setServicoId] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [mensagemModal, setMensagemModal] = useState(null)
+  const [modalAction, setModalAction] = useState(null)
   const [menuAgendamentoId, setMenuAgendamentoId] = useState(null)
   const navigate = useNavigate()
   const clienteSelecionadaDados = clientes.find((cliente) => String(cliente.id) === String(clienteSelecionada))
@@ -288,6 +290,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
     setClienteSelecionada('')
     setClienteManual({ name: '' })
     setMensagemModal(null)
+    setModalAction(null)
   }
 
   const confirmarAgendamento = async (event) => {
@@ -366,7 +369,17 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
       window.dispatchEvent(new Event('calash:appointments-changed'))
       setMensagemModal(isProfessional ? 'Agendamento criado com sucesso.' : 'Solicitação enviada. Aguarde a aprovação da profissional.')
     } catch (error) {
+      const codigoErro = error.response?.data?.code
+
+      if (error.response?.status === 403 && codigoErro === 'email_not_verified') {
+        setMensagemModal('Seu e-mail ainda não foi verificado. Reenviar e-mail de confirmação para continuar.')
+        setModalAction('resend-verification')
+        setSalvando(false)
+        return
+      }
+
       setMensagemModal(formatarErroApi(error, 'Não foi possível salvar o agendamento.'))
+      setModalAction(null)
     } finally {
       setSalvando(false)
     }
@@ -595,6 +608,19 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
             {mensagemModal ? (
               <div className="agenda-modal-feedback">
                 <p>{mensagemModal}</p>
+                {modalAction === 'resend-verification' && (
+                  <ResendVerificationButton
+                    className="agenda-overwrite-action"
+                    buttonText="Reenviar e-mail de confirmação"
+                    onDone={(texto) => {
+                      setMensagemModal(texto)
+                      setModalAction(null)
+                    }}
+                    onError={(texto) => {
+                      setMensagemModal(texto)
+                    }}
+                  />
+                )}
                 {isProfessional && /já existe|existe um agendamento/i.test(mensagemModal) && (
                   <button type="button" className="agenda-overwrite-action" onClick={sobreporAgendamento} disabled={salvando}>
                     {salvando ? 'Sobrepondo...' : 'Sobrepor agendamento'}
