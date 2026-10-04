@@ -315,14 +315,10 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
     try {
       let clientId = null
       if (isProfessional) {
-        if (clienteManualAtivo) {
-          const { data } = await api.post('/auth/clients/', { name: clienteManual.name })
-          clientId = data.id
-          setClientes((atuais) => [...atuais, data])
-        } else {
+        if (!clienteManualAtivo) {
           clientId = Number(clienteSelecionada)
         }
-        if (!clientId) {
+        if (!clienteManualAtivo && !clientId) {
           setMensagemModal('Escolha uma cliente ou ative o modo cliente manual.')
           setSalvando(false)
           return
@@ -334,7 +330,8 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
         {
           service: Number(servicoId),
           start_datetime: `${dataSelecionada}T${horarioSelecionado}:00`,
-          ...(isProfessional ? { client: clientId } : {}),
+          ...(isProfessional && !clienteManualAtivo ? { client: clientId } : {}),
+          ...(isProfessional && clienteManualAtivo ? { client_name: clienteManual.name.trim() } : {}),
         }
       )
 
