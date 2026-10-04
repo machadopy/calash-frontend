@@ -325,7 +325,6 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
         }
       }
       const servicoSelecionado = servicos.find((servico) => String(servico.id) === servicoId)
-      const emailClienteManual = `manual-${Date.now()}@anonymous.local`
       const response = await api.post(
         publicSlug ? `/public/${publicSlug}/appointments/` : '/appointments/',
         {
@@ -333,7 +332,6 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
           start_datetime: `${dataSelecionada}T${horarioSelecionado}:00`,
           ...(isProfessional && !clienteManualAtivo ? { client: clientId } : {}),
           ...(isProfessional && clienteManualAtivo ? { client_name: clienteManual.name.trim() } : {}),
-          ...(isProfessional && clienteManualAtivo ? { email: emailClienteManual } : {}),
         }
       )
 
