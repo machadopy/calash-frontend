@@ -12,6 +12,19 @@ const formatarDuracao = (minutos) => {
   return restantes ? `${horas}h${String(restantes).padStart(2, '0')}` : `${horas}h`
 }
 
+const formatarErroApi = (error, mensagemPadrao) => {
+  const detalhes = error.response?.data
+  if (!detalhes || typeof detalhes !== 'object') return mensagemPadrao
+
+  const nomesCampos = { client: 'Cliente', email: 'E-mail', name: 'Nome' }
+  const mensagens = Object.entries(detalhes).flatMap(([campo, valor]) => {
+    const texto = Array.isArray(valor) ? valor.join(' ') : String(valor)
+    return `${nomesCampos[campo] || campo}: ${texto}`
+  })
+
+  return mensagens.join(' ') || mensagemPadrao
+}
+
 export default function AgendaGrid({ isProfessional, publicSlug = null, selectedDate, onDateChange, services = SERVICOS_VAZIOS }) {
   const [dataInterna, setDataInterna] = useState(new Date().toISOString().split('T')[0])
   const dataSelecionada = selectedDate ?? dataInterna
@@ -356,11 +369,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
       window.dispatchEvent(new Event('calash:appointments-changed'))
       setMensagemModal(isProfessional ? 'Agendamento criado com sucesso.' : 'Solicitação enviada. Aguarde a aprovação da profissional.')
     } catch (error) {
-      const detalhes = error.response?.data
-      const mensagem = detalhes && typeof detalhes === 'object'
-        ? Object.values(detalhes).flat().join(' ')
-        : null
-      setMensagemModal(mensagem || 'Não foi possível salvar o agendamento.')
+      setMensagemModal(formatarErroApi(error, 'Não foi possível salvar o agendamento.'))
     } finally {
       setSalvando(false)
     }
