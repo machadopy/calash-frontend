@@ -1,0 +1,32 @@
+[1mdiff --git a/src/pages/Login.jsx b/src/pages/Login.jsx[m
+[1mindex 45315cf..f948153 100644[m
+[1m--- a/src/pages/Login.jsx[m
+[1m+++ b/src/pages/Login.jsx[m
+[36m@@ -31,10 +31,10 @@[m [mexport default function Login() {[m
+           ? origem[m
+           : `/${user.professional_slug}/dashboard`[m
+ [m
+[31m-        const destino = user.is_professional[m
+[31m-          ? destinoProfissional[m
+[31m-          : user.is_superuser[m
+[32m+[m[32m        const destino = user.is_superuser[m
+           ? ADMIN_URL[m
+[32m+[m[32m          : user.is_professional[m
+[32m+[m[32m          ? destinoProfissional[m
+           : (slugDaOrigem ? `/${slugDaOrigem}` : '/calash')[m
+         if (ehLinkExterno(destino)) {[m
+           window.location.assign(destino)[m
+[36m@@ -70,10 +70,10 @@[m [mexport default function Login() {[m
+       const destinoProfissional = origem && origem !== '/calash'[m
+         ? origem[m
+         : `/${user.professional_slug}/dashboard`[m
+[31m-      const destino = user.is_professional[m
+[31m-        ? destinoProfissional[m
+[31m-        : user.is_superuser[m
+[32m+[m[32m      const destino = user.is_superuser[m
+         ? ADMIN_URL[m
+[32m+[m[32m        : user.is_professional[m
+[32m+[m[32m        ? destinoProfissional[m
+         : (slugDaOrigem ? `/${slugDaOrigem}` : '/calash')[m
+       if (ehLinkExterno(destino)) {[m
+         window.location.assign(destino)[m
