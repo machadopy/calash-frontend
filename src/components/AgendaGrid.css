@@ -4,12 +4,16 @@
   border: 1px solid #d5ebeb;
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(44, 44, 44, 0.05);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .agenda-grid-table {
   overflow: hidden;
   border: 1px solid #d5ebeb;
   border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .agenda-grid-header,
@@ -17,6 +21,8 @@
   display: grid;
   grid-template-columns: 72px minmax(0, 1fr) 150px;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .agenda-grid-header {
@@ -34,6 +40,7 @@
   border-top: 1px solid #d5ebeb;
   cursor: pointer;
   transition: background 0.2s ease;
+  min-width: 0;
 }
 
 .agenda-grid-row:focus-visible {
@@ -106,6 +113,7 @@
 .agenda-grid-scroll {
   max-height: 60vh;
   overflow-y: auto;
+  width: 100%;
 }
 
 .agenda-grid-status {
@@ -118,11 +126,34 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
+  max-width: 100%;
 }
 
 .agenda-client-line > span {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+/* Proteção extra para células de dias do calendário / contadores que estouram */
+.agenda-day-cell, 
+.calendar-day-cell,
+[class*="day"] {
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Garante que o rótulo de "+X agendamentos" fique contido sem vazar */
+.agenda-more-indicator,
+.more-events,
+span[class*="agendamentos"] {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  box-sizing: border-box;
 }
 
 .agenda-row-menu {
@@ -224,6 +255,7 @@
   padding: 20px;
   place-items: center;
   background: rgba(44, 44, 44, 0.35);
+  box-sizing: border-box;
 }
 
 .agenda-modal {
@@ -235,6 +267,7 @@
   border: 1px solid #d5ebeb;
   border-radius: 16px;
   box-shadow: 0 18px 50px rgba(44, 44, 44, 0.2);
+  box-sizing: border-box;
 }
 
 .agenda-modal-heading {
@@ -296,6 +329,7 @@
   background: #f4fbfc;
   border: 1px solid #d5ebeb;
   border-radius: 10px;
+  box-sizing: border-box;
 }
 
 .agenda-client-toggle {
@@ -310,22 +344,26 @@
 .agenda-client-picker select,
 .agenda-client-fields input {
   width: 100%;
+  max-width: 100%;
   padding: 10px;
   color: #4a5c5c;
   font-size: 12px;
   background: #fff;
   border: 1px solid #d5ebeb;
   border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .agenda-client-fields {
   display: grid;
   gap: 8px;
+  width: 100%;
 }
 
 .agenda-service-list {
   display: grid;
   gap: 8px;
+  width: 100%;
 }
 
 .agenda-service-option {
@@ -337,6 +375,8 @@
   border: 1px solid #d5ebeb;
   border-radius: 10px;
   cursor: pointer;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .agenda-service-option.selected {
@@ -351,6 +391,7 @@
 .agenda-service-option span {
   display: grid;
   gap: 3px;
+  min-width: 0;
 }
 
 .agenda-service-option small {
@@ -370,6 +411,7 @@
   border: 0;
   border-radius: 9px;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .agenda-modal-submit:hover,
@@ -398,6 +440,7 @@
   border: 0;
   border-radius: 9px;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .agenda-lunch-action:hover {
@@ -415,6 +458,7 @@
   border: 1px solid #fdba74;
   border-radius: 9px;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .agenda-lunch-duration {
@@ -424,9 +468,12 @@
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
+  width: 100%;
 }
 
 .agenda-lunch-duration select {
+  width: 100%;
+  max-width: 100%;
   padding: 11px;
   color: #4a5c5c;
   font-size: 13px;
@@ -434,6 +481,7 @@
   background: #fff;
   border: 1px solid #f2c27b;
   border-radius: 9px;
+  box-sizing: border-box;
 }
 
 .agenda-modal-submit:disabled {
