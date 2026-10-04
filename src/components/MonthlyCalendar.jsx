@@ -74,7 +74,12 @@ export default function MonthlyCalendar({ publicSlug = null, isProfessional = fa
     }
 
     carregarAgendamentos()
-    return () => { ativo = false }
+    const recarregarAgendamentos = () => carregarAgendamentos()
+    window.addEventListener('calash:appointments-changed', recarregarAgendamentos)
+    return () => {
+      ativo = false
+      window.removeEventListener('calash:appointments-changed', recarregarAgendamentos)
+    }
   }, [celulas, isProfessional, publicSlug])
 
   const agendamentosPorDia = useMemo(() => agendamentos.reduce((dias, agendamento) => {

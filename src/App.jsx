@@ -9,6 +9,7 @@ import Agendamentos from './pages/Agendamentos'
 import AgendaPublica from './pages/AgendaPublica'
 import HomeAgenda from './pages/HomeAgenda'
 import DailyAgenda from './pages/DailyAgenda'
+import Anamneses from './pages/Anamneses'
 import ProfessionalRoute from './components/ProfessionalRoute'
 import AuthenticatedRoute from './components/AuthenticatedRoute'
 
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/:slug/servicos" element={<ProfessionalRoute><Servicos /></ProfessionalRoute>} />
         <Route path="/:slug/services" element={<ProfessionalRoute><Servicos /></ProfessionalRoute>} />
         <Route path="/:slug/working-hours" element={<ProfessionalRoute><WorkingHours /></ProfessionalRoute>} />
+        <Route path="/:slug/anamneses" element={<ProfessionalRoute><Anamneses /></ProfessionalRoute>} />
         <Route path="/:slug/perfil" element={<AuthenticatedRoute><Perfil /></AuthenticatedRoute>} />
         <Route path="/:slug/agendamentos" element={<AuthenticatedRoute><Agendamentos /></AuthenticatedRoute>} />
       </Routes>

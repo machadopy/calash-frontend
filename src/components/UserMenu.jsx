@@ -89,6 +89,7 @@ export default function UserMenu() {
             <>
               <Link to={`/${destino}/procedimentos`} onClick={() => setAberto(false)}>Procedimentos</Link>
               <Link to={`/${destino}/working-hours`} onClick={() => setAberto(false)}>Horários de atendimento</Link>
+              <Link to={`/${destino}/anamneses`} onClick={() => setAberto(false)}>Fichas de anamnese</Link>
             </>
           )}
           {temAgendamentosAbertos && (

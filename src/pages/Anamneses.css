@@ -1,0 +1,93 @@
+.anamneses-page {
+  display: grid;
+  gap: 20px;
+}
+
+.anamneses-toolbar,
+.anamneses-heading-row,
+.anamneses-editor-heading,
+.anamneses-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.anamneses-toolbar {
+  justify-content: center;
+}
+
+.anamneses-toolbar button,
+.anamneses-editor-heading button {
+  padding: 9px 12px;
+  color: #779fa3;
+  font-size: 12px;
+  background: #f4fbfc;
+  border: 1px solid #d5ebeb;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.anamneses-toolbar label {
+  display: grid;
+  gap: 5px;
+  color: #667777;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.anamneses-toolbar input,
+.anamneses-client-picker input,
+.anamneses-client-picker select {
+  padding: 10px 12px;
+  color: #4a5c5c;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid #d5ebeb;
+  border-radius: 8px;
+}
+
+.anamneses-kicker {
+  margin: 0 0 4px;
+  color: #779fa3;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.anamneses-heading-row h2,
+.anamneses-editor-heading h3,
+.anamneses-card h3 {
+  margin: 0;
+  color: #2c2c2c;
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+}
+
+.anamneses-heading-row h2 { font-size: 23px; text-transform: capitalize; }
+.anamneses-editor-heading h3 { font-size: 20px; }
+.anamneses-new { padding: 11px 14px; color: #fff; font-size: 12px; font-weight: 700; background: #779fa3; border: 0; border-radius: 9px; cursor: pointer; }
+.anamneses-editor { display: grid; gap: 18px; padding: 18px; background: #f9fdfd; border: 1px solid #d5ebeb; border-radius: 12px; }
+.anamneses-client-picker { display: grid; gap: 8px; }
+.anamneses-client-check { display: flex; align-items: center; gap: 7px; color: #4a5c5c; font-size: 12px; font-weight: 600; }
+.anamneses-client-check input { accent-color: #779fa3; }
+.anamneses-list { display: grid; gap: 12px; }
+.anamneses-card { padding: 16px; background: #fff; border: 1px solid #d5ebeb; border-radius: 10px; box-shadow: 0 1px 3px rgba(44, 44, 44, .05); cursor: pointer; }
+.anamneses-card:hover, .anamneses-card:focus-visible { border-color: #95c6cc; box-shadow: 0 4px 14px rgba(119, 159, 163, .15); outline: none; }
+.anamneses-card-heading { align-items: flex-start; }
+.anamneses-card-heading h3 { font-size: 19px; }
+.anamneses-card-download { padding: 0; color: #2c2c2c; font: inherit; font-family: 'Playfair Display', serif; font-size: 19px; text-align: left; background: transparent; border: 0; cursor: pointer; }
+.anamneses-card-download:hover { color: #779fa3; text-decoration: underline; }
+.anamneses-card-heading span, .anamneses-card p { color: #667777; font-size: 12px; }
+.anamneses-card p { margin: 7px 0 0; }
+.anamneses-feedback, .anamneses-error { margin: 0; color: #94a3b8; font-size: 12px; text-align: center; }
+.anamneses-error { color: #dc6262; }
+
+@media (max-width: 600px) {
+  .anamneses-heading-row { align-items: flex-start; flex-direction: column; }
+  .anamneses-new { width: 100%; }
+  .anamneses-card-heading { align-items: flex-start; flex-direction: column; gap: 5px; }
+}

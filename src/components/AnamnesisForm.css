@@ -1,0 +1,51 @@
+.anamnesis-form {
+  display: grid;
+  gap: 20px;
+  color: #4a5c5c;
+}
+
+.anamnesis-heading h3,
+.anamnesis-section h4 {
+  margin: 0;
+  color: #2c2c2c;
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+}
+
+.anamnesis-heading h3 { font-size: 21px; text-transform: capitalize; }
+.anamnesis-heading p { margin: 5px 0 0; font-size: 12px; }
+.anamnesis-kicker { color: #779fa3 !important; font-size: 11px !important; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.anamnesis-section { display: grid; gap: 14px; padding-top: 18px; border-top: 1px solid #d5ebeb; }
+.anamnesis-section h4 { font-size: 19px; }
+.anamnesis-fields { display: grid; gap: 12px; }
+.anamnesis-form label { display: grid; gap: 6px; color: #667777; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+.anamnesis-form input:not([type='radio']):not([type='checkbox']), .anamnesis-form textarea { width: 100%; padding: 10px; color: #2c2c2c; font-size: 13px; font-weight: 400; text-transform: none; background: #fff; border: 1px solid #d5ebeb; border-radius: 8px; outline: none; }
+.anamnesis-form textarea { resize: vertical; }
+.anamnesis-form input:focus, .anamnesis-form textarea:focus { border-color: #95c6cc; box-shadow: 0 0 0 3px rgba(149, 198, 204, .2); }
+.anamnesis-questions { display: grid; gap: 14px; }
+.anamnesis-question { min-width: 0; display: grid; gap: 8px; padding: 12px; border: 1px solid #d5ebeb; border-radius: 10px; }
+.anamnesis-question legend { padding: 0; color: #4a5c5c; font-size: 12px; font-weight: 600; line-height: 1.45; }
+.anamnesis-radios { display: flex; gap: 18px; }
+.anamnesis-radios label, .anamnesis-consent { display: flex !important; align-items: center; gap: 6px; color: #4a5c5c !important; font-size: 12px !important; text-transform: none !important; }
+.anamnesis-radios input, .anamnesis-consent input { accent-color: #779fa3; }
+.anamnesis-notes { font-size: 10px !important; }
+.anamnesis-term { margin: 0; color: #667777; font-size: 12px; line-height: 1.6; }
+.anamnesis-notice { margin: 0; padding: 10px; color: #5f898e; font-size: 12px; background: #f4fbfc; border: 1px solid #d5ebeb; border-radius: 8px; }
+.anamnesis-error { color: #dc6262; font-size: 11px; font-weight: 500; text-transform: none; }
+.anamnesis-feedback { margin: 0; color: #779fa3; font-size: 12px; text-align: center; }
+.anamnesis-feedback.error { color: #dc6262; }
+.anamnesis-signature-field { display: grid; gap: 8px; }
+.anamnesis-signature-box { position: relative; height: 180px; overflow: hidden; border: 2px dashed #95c6cc; border-radius: 8px; background: #fff; }
+.anamnesis-signature-canvas { width: 100%; height: 100%; touch-action: none; }
+.anamnesis-signature-placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #aabbbb; font-size: 12px; pointer-events: none; }
+.anamnesis-clear { justify-self: start; padding: 7px 12px; color: #779fa3; font-size: 12px; background: #f4fbfc; border: 1px solid #d5ebeb; border-radius: 7px; cursor: pointer; }
+.anamnesis-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; }
+.anamnesis-actions button { padding: 12px; font-size: 12px; font-weight: 700; border: 0; border-radius: 9px; cursor: pointer; }
+.anamnesis-cancel { color: #779fa3; background: #f4fbfc; }
+.anamnesis-submit { color: #fff; background: #95c6cc; }
+.anamnesis-submit:hover { background: #779fa3; }
+.anamnesis-submit:disabled, .anamnesis-cancel:disabled { cursor: wait; opacity: .7; }
+
+@media (min-width: 600px) {
+  .anamnesis-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

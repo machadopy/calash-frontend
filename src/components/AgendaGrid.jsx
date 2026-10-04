@@ -36,6 +36,10 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
   const [mensagemModal, setMensagemModal] = useState(null)
   const [menuAgendamentoId, setMenuAgendamentoId] = useState(null)
   const navigate = useNavigate()
+  const clienteSelecionadaDados = clientes.find((cliente) => String(cliente.id) === String(clienteSelecionada))
+  const nomeClienteAtual = clienteManualAtivo
+    ? clienteManual.name
+    : clienteSelecionadaDados?.name
 
   useEffect(() => {
     if (menuAgendamentoId === null) return undefined
@@ -274,11 +278,21 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
   }
 
   const confirmarAgendamento = async (event) => {
-    event.preventDefault()
+    event?.preventDefault()
     if (!servicoId || !horarioSelecionado) return
 
     if (!isProfessional && !localStorage.getItem('accessToken')) {
       navigate('/login', { state: { from: window.location.pathname, date: dataSelecionada } })
+      return
+    }
+
+    if (isProfessional && !clienteManualAtivo && !clienteSelecionada) {
+      setMensagemModal('Escolha uma cliente antes de continuar.')
+      return
+    }
+
+    if (isProfessional && clienteManualAtivo && !clienteManual.name.trim()) {
+      setMensagemModal('Informe o nome da cliente manual antes de continuar.')
       return
     }
 
@@ -304,7 +318,11 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
       const servicoSelecionado = servicos.find((servico) => String(servico.id) === servicoId)
       const response = await api.post(
         publicSlug ? `/public/${publicSlug}/appointments/` : '/appointments/',
-        { service: Number(servicoId), start_datetime: `${dataSelecionada}T${horarioSelecionado}:00`, ...(isProfessional ? { client: clientId } : {}) }
+        {
+          service: Number(servicoId),
+          start_datetime: `${dataSelecionada}T${horarioSelecionado}:00`,
+          ...(isProfessional ? { client: clientId } : {}),
+        }
       )
 
       const duracao = servicoSelecionado?.duration_minutes || 60
@@ -335,6 +353,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
         }
         return atualizados
       })
+      window.dispatchEvent(new Event('calash:appointments-changed'))
       setMensagemModal(isProfessional ? 'Agendamento criado com sucesso.' : 'Solicitação enviada. Aguarde a aprovação da profissional.')
     } catch (error) {
       const detalhes = error.response?.data
@@ -448,6 +467,22 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
             const ocupado = agendamentos[horario]
             const ehAlmoco = ocupado?.isLunch || (isProfessional && almoco && horario >= almoco.start_time.slice(0, 5) && horario < almoco.end_time.slice(0, 5))
             const item = ehAlmoco && !ocupado ? { isLunch: true, status: 'lunch' } : ocupado
+
+            if (item && !item.isLunch && !item.inicio) return null
+
+            const fimDoAgendamento = item?.inicio && item.duracao
+              ? new Date(2000, 0, 1, Number(horario.slice(0, 2)), Number(horario.slice(3, 5)) + item.duracao)
+              : null
+            const faixaDoAgendamento = fimDoAgendamento
+              ? `${horario} - ${String(fimDoAgendamento.getHours()).padStart(2, '0')}:${String(fimDoAgendamento.getMinutes()).padStart(2, '0')}`
+              : horario
+            const classeDaLinha = item?.inicio && !item.unico
+              ? 'agenda-grid-row-compressed'
+              : item?.isLunch
+                ? 'agenda-grid-row-lunch'
+                : item
+                  ? (item.unico ? 'agenda-grid-row-single' : item.inicio ? 'agenda-grid-row-start' : item.fim ? 'agenda-grid-row-end' : 'agenda-grid-row-middle')
+                  : ''
             
             return (
               <div
@@ -464,9 +499,9 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
                 }}
                 role="button"
                 tabIndex={item && (!item.isLunch || !isProfessional) ? -1 : 0}
-                className={`agenda-grid-row text-sm ${item?.isLunch ? 'agenda-grid-row-lunch' : item ? (item.unico ? 'agenda-grid-row-single' : item.inicio ? 'agenda-grid-row-start' : item.fim ? 'agenda-grid-row-end' : 'agenda-grid-row-middle') : ''}`}
+                className={`agenda-grid-row text-sm ${classeDaLinha}`}
               >
-                <div className="font-medium text-slate-500">{horario}</div>
+                <div className="font-medium text-slate-500">{faixaDoAgendamento}</div>
                 <div className="text-slate-700">
                   {item?.isLunch ? <div className="agenda-lunch-label">Almoço</div> : item && !publicSlug ? (
                     <>
@@ -545,6 +580,7 @@ export default function AgendaGrid({ isProfessional, publicSlug = null, selected
             <div className="agenda-modal-heading">
               <div>
                 <p className="agenda-modal-kicker">{modoAlmoco ? 'Configurar almoço' : agendamentoEditando ? 'Editar agendamento' : 'Novo agendamento'}</p>
+                {nomeClienteAtual && <p className="agenda-modal-client-name">{nomeClienteAtual}</p>}
                 <h3 id="agenda-modal-title">{dataSelecionada.split('-').reverse().join('/')} às {horarioSelecionado}</h3>
               </div>
               <button type="button" className="agenda-modal-close" onClick={fecharModal} aria-label="Fechar">×</button>
