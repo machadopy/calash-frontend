@@ -24,9 +24,86 @@ html,
 	height: 100%;
 }
 
+:root {
+	--font-scale: 1;
+}
+
+#root {
+	font-size: calc(16px * var(--font-scale));
+	zoom: var(--font-scale);
+}
+
 button,
 input,
 select,
 textarea {
 	font: inherit;
+}
+
+html.high-contrast {
+	background: #fff;
+}
+
+html.high-contrast body,
+html.high-contrast #root,
+html.high-contrast .layout-page,
+html.high-contrast .layout-card,
+html.high-contrast .layout-content {
+	color: #111;
+	background: #fff;
+}
+
+html.high-contrast .layout-header {
+	color: #111;
+	background: #fff;
+	border-bottom: 3px solid #111;
+}
+
+html.high-contrast .layout-title,
+html.high-contrast .layout-subtitle,
+html.high-contrast h1,
+html.high-contrast h2,
+html.high-contrast h3,
+html.high-contrast p,
+html.high-contrast label,
+html.high-contrast span,
+html.high-contrast a {
+	color: #111;
+}
+
+html.high-contrast button,
+html.high-contrast input,
+html.high-contrast select,
+html.high-contrast textarea,
+html.high-contrast .agenda-modal,
+html.high-contrast .agenda-modal-backdrop,
+html.high-contrast .monthly-calendar-day,
+html.high-contrast .agenda-row,
+html.high-contrast .login-notice {
+	border: 2px solid #111;
+}
+
+html.high-contrast button,
+html.high-contrast input,
+html.high-contrast select,
+html.high-contrast textarea {
+	color: #111;
+	background: #fff;
+}
+
+html.high-contrast .agenda-modal,
+html.high-contrast .monthly-calendar-day,
+html.high-contrast .agenda-row,
+html.high-contrast .user-menu-dropdown {
+	background: #fff;
+}
+
+html.high-contrast .monthly-calendar-event,
+html.high-contrast .agenda-status-pending,
+html.high-contrast .agenda-status-scheduled,
+html.high-contrast .login-error,
+html.high-contrast .login-success {
+	color: #111;
+	background: #fff;
+	border: 2px solid #111;
 }

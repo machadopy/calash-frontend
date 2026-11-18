@@ -1,0 +1,70 @@
+.accessibility-controls {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 3;
+  display: flex;
+  gap: 6px;
+}
+
+.accessibility-button {
+  min-width: 36px;
+  height: 34px;
+  padding: 0 9px;
+  color: #1f3f43;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid #55777a;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.accessibility-contrast {
+  min-width: 72px;
+}
+
+.accessibility-button:hover:not(:disabled),
+.accessibility-button[aria-pressed='true'] {
+  color: #fff;
+  background: #1f3f43;
+  border-color: #1f3f43;
+}
+
+.accessibility-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.accessibility-button:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role='button']:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .accessibility-controls {
+    top: 10px;
+    left: 10px;
+  }
+
+  .accessibility-contrast {
+    width: 34px;
+    min-width: 34px;
+    overflow: hidden;
+    color: transparent;
+  }
+
+  .accessibility-contrast::before {
+    content: 'C';
+    color: #1f3f43;
+  }
+
+  .accessibility-contrast[aria-pressed='true']::before {
+    color: #fff;
+  }
+}

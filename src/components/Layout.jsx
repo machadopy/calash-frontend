@@ -1,11 +1,13 @@
 import './Layout.css'
 import UserMenu from './UserMenu'
+import AccessibilityControls from './AccessibilityControls'
 
 export default function Layout({ children, title, subtitle, showUserMenu = true, wide = false }) {
   return (
     <div className="layout-page">
       <div className={`layout-card${wide ? ' layout-card-wide' : ''}`}>
         <div className="layout-header">
+          <AccessibilityControls />
           {showUserMenu && <UserMenu />}
           <h1 className="layout-title">
             {title || "Calash Studio"}
